@@ -10,7 +10,8 @@ button {
     border: none;
     font-size: 16px;
     border-radius: 10px;
-    padding: 1.2% 5%;
+    padding: 1em 3em;
+    
 }
 
 .text-centered {
@@ -29,16 +30,31 @@ button {
 }
 
 .main{
+    margin: 10em 10em 5em 10em;
     display: flex;
     flex-flow: column wrap;
     justify-content: space-between;
     align-items: center;
-    padding: 10% 20%;
 }
 
 .main-content{
-    margin: 2% 0;
-    width: 100%;
+    margin-bottom: 1em;
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: center;
+    align-self: stretch;
+}
+
+.result-content{
+    margin-bottom: 1em;
+    display: flex;
+    justify-content: flex-start;
+    align-self: stretch;
+}
+
+.highscore-submission{
+    display: flex;
+    justify-content: space-around;
 }
 
 .answer-choices{
@@ -61,3 +77,6 @@ button {
     font-size: 20px;
 }
 
+.flex-start{
+    align-self: flex-start;
+}

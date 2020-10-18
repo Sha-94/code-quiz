@@ -1,11 +1,15 @@
-const TIME_LIMIT = 10;
-var mainEl = document.querySelector('main');
-var startQuizButtonEl = document.getElementById('start-quiz');
-var timerEl = document.getElementById('timer');
+const TIME_LIMIT = 30;
+var  mainEl = document.querySelector('main');
+
+var answerChoicesEl;
+var startQuizButtonEl;
+var timerEl;
+var previousResult;
 
 var timer;
 var time = 0;
 var quitQuiz = false;
+var problemIndex = 0;
 var problemArray = [
     {
         question: 'Commonly used data types do NOT include: ',
@@ -48,26 +52,24 @@ var problemArray = [
         answerChoices: [
             {answer: 'JavaScript', correct: false}, 
             {answer: 'terminal/bash', correct: false}, 
-            {answer: 'for loops', correct: true}, 
-            {answer: 'console.log', correct: false}
+            {answer: 'for loops', correct: false}, 
+            {answer: 'console.log', correct: true}
         ]
     }
 ]
 
-startQuizButtonEl.addEventListener('click', startQuiz);
+//generateStartPage();
 
 function startQuiz(){
     startClock();
-    clearMain();
-    displayAssessment();
+    displayAssessment(problemIndex);
 }
 
-function displayAssessment(){
-    let problemIndex = 0;    
+function displayAssessment(problemIndex){    
     if(time != 0 && !quitQuiz && problemIndex < problemArray.length){
         let problem = problemArray[problemIndex];
-        console.log(problem);
         generateProblemHTML(problem);
+    } else{
 
     }
 }
@@ -78,7 +80,7 @@ function clearMain(){
     }
 }
 
-function stopQuiz(){
+function endQuiz(){
     quitQuiz = true;
     console.log('stop button clicked');
 }
@@ -94,17 +96,28 @@ function decrement(){
     } else {
         clearInterval(timer);
         generateStartPage();
-        console.log('quiz over');
     }
 
     console.log(time);
     timerEl.textContent = time;
 }
 
+function checkAnswer(event){
+    let isCorrect = (event.target.getAttribute('data-answer-correct') === 'true');
+    if(isCorrect){
+        previousResult = 'Correct!';
+    }else {
+        previousResult = 'Wrong!'
+        time-=10
+    }
+    displayAssessment(++problemIndex);
+}
+
 /* ********************** HTML GENERATORS ********************** */
 /* Start Page Generator */
 function generateStartPage(){
     clearMain();
+
     let headingDivEl = generateHeadingDivEl();
     let paragraphDivEl = generateParagraphDivEl();
     let startButtonDivEl = generateStartButtonDivEl();
@@ -112,6 +125,12 @@ function generateStartPage(){
     mainEl.appendChild(headingDivEl);
     mainEl.appendChild(paragraphDivEl);
     mainEl.appendChild(startButtonDivEl);
+
+    startQuizButtonEl = document.getElementById('start-quiz');
+    timerEl = document.getElementById('timer');
+
+    startQuizButtonEl.addEventListener('click', startQuiz);
+
 }
 
 function generateMainContentDiv(){
@@ -162,6 +181,11 @@ function generateProblemHTML(problem){
     clearMain();
     mainEl.appendChild(questionEl);
     mainEl.appendChild(answerChoicesEl);
+
+    if(previousResult){
+        mainEl.appendChild(generateHorizonalRowEl())
+        mainEl.appendChild(generatePreviousResultEl());
+    }
 }
 
 function generateQuestionEl(problem){
@@ -180,10 +204,32 @@ function generateAnswerChoiceEl(problem){
 
     for(let index = 0; index < problem.answerChoices.length; index++){
         let buttonEl = document.createElement('button');
-        buttonEl.textContent = index + '. ' + choice.answer;
+        buttonEl.setAttribute('class', 'answer-button');
+        buttonEl.setAttribute('data-answer-correct', problem.answerChoices[index].correct)
+        buttonEl.textContent = (index + 1) + '. ' + problem.answerChoices[index].answer;
+        console.dir(buttonEl);
         divEl.appendChild(buttonEl);
     }
 
-    return divEl;
+    divEl.addEventListener('click', checkAnswer);
 
+    return divEl;
+}
+function generateHorizonalRowEl(){
+    var horizontalDivEl = document.createElement('div');
+    horizontalDivEl.setAttribute('class', 'main-content horizontal-row');
+
+    return horizontalDivEl;
+
+}
+function generatePreviousResultEl(result){
+    var previousDivEl = document.createElement('div');
+    var resultDivEl = document.createElement('p');
+
+    previousDivEl.setAttribute('class', 'main-content flex-start');
+    resultDivEl.setAttribute('id', 'previous-result');
+    resultDivEl.textContent = previousResult;
+
+    previousDivEl.appendChild(resultDivEl);
+    return previousDivEl;
 }
