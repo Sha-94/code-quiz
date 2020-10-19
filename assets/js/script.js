@@ -132,7 +132,7 @@ function checkAnswer(event){
 }
 
 function logScore(){
-    if(inputDivEl.querySelector('input').value.trim()){
+    if(inputDivEl.querySelector('input').value.trim() === ''){
         alert('Please enter initials before clicking submit.');
     } else {
         const newScore = {
