@@ -1,16 +1,15 @@
-const TIME_LIMIT = 35;
+const TIME_LIMIT = 75;
 const PENALTY = 10;
 
-var highscores = getHighScores();
 var  mainEl = document.querySelector('main');
 var timerEl = document.getElementById('timer');
-
 
 var answerChoicesEl;
 var startQuizButtonEl;
 var inputDivEl;
 var previousResult;
 
+var highscores = getHighScores();
 var timer;
 var time = 0;
 var score;
@@ -64,6 +63,7 @@ var problemArray = [
     }
 ]
 
+/* Starting point of application */
 generateStartPage();
 
 function getHighScores() {
@@ -78,6 +78,7 @@ function initializeQuiz(){
     timerEl.textContent = time;
     clearMain();
 }
+
 function startQuiz(){
     startClock();
     displayAssessment(problemIndex);
@@ -99,7 +100,6 @@ function clearMain(){
 }
 
 function endQuiz(){
-    console.log('ending quiz');
     clearInterval(timer);
     generateFeedbackPage();
 
@@ -132,29 +132,31 @@ function checkAnswer(event){
 }
 
 function logScore(){
-    console.log('highscores', highscores, highscores.length);
-    const newScore = {
-        initials: inputDivEl.querySelector('input').value,
-        score: score 
-     };
-
-     highscores.push(newScore);
-     highscores.sort(function(a, b){return b.score - a.score});
-
-     if(highscores.length >= 4) {
-        highscores = highscores.slice(0,3);
-     }
-
-     localStorage.setItem('highscores', JSON.stringify(highscores));
-
-     generateHighscorePage();
+    if(inputDivEl.querySelector('input').value.trim()){
+        alert('Please enter initials before clicking submit.');
+    } else {
+        const newScore = {
+            initials: inputDivEl.querySelector('input').value,
+            score: score 
+         };
+    
+         highscores.push(newScore);
+         highscores.sort(function(a, b){return b.score - a.score});
+    
+         if(highscores.length >= 4) {
+            highscores = highscores.slice(0,3);
+         }
+    
+         localStorage.setItem('highscores', JSON.stringify(highscores));
+    
+         generateHighscorePage();
+    }
 }
 
 function clearHighScores(){
     localStorage.clear();
     generateHighscorePage();
 }
-
 
 /* ********************** HTML GENERATORS ********************** */
 /* Start Page Generator */
@@ -290,10 +292,10 @@ function generateFeedbackPage(){
 function generateFeedbackDivEl(){
     var divEl = document.createElement('div');
     divEl.setAttribute('class', 'result-content');
-    //divEl.classList.add('other-content');
 
     return divEl;
 }
+
 function generateFeedbackHeaderDivEl(){
     var divEl = generateFeedbackDivEl();
     var headingEl = document.createElement('h1');
@@ -405,7 +407,6 @@ function generateHighscoreParagraphDivEl(index, highscore){
     divEl.appendChild(paragraphEl);
 
     return divEl;
-
 }
 
 function generateHighscoreButtonsDivEl(){
@@ -445,4 +446,3 @@ function generateHighscoreClearButtonDivEl(){
 
     return divEl;
 }
-
