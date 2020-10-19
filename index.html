@@ -9,14 +9,16 @@
 <body>
     <header class="header">
         <div>
-            <a href="#" >View high scores</a>
+            <a href="#" onclick="generateHighscorePage()" >View high scores</a>
         </div>
         <div>
-            <p>Time: <span id="timer">00</span></p>
+            <p>Time: <span id="timer">0</span></p>
         </div>
     </header>
     <main class="main">
-       <!--  <div class="main-content">
+    <!-- ******* LOAD UP PAGE MODEL ******* -->
+    <!-- 
+        <div class="main-content">
             <h1> Coding Quiz Challenge</h1>
         </div>
         <div class="main-content">
@@ -27,41 +29,76 @@
         </div>
         <div class="main-content">
             <button id="start-quiz">Start Quiz</button>
-        </div> -->
-
-   <!--  <div class="main-content">
-        <h1>A very useful tool used during development and debugging for printing content to the debugger is:</h1>
-    </div>
-    <div class="main-content answer-choices"> 
-        <button class="answer-button">Javascript</button>
-        <button class="answer-button">terminal/bash</button>
-        <button class="answer-button">for loops</button>
-        <button class="answer-button">console.log</button>
-     </div>
-    <div class="main-content horizontal-row">
-    </div>
-    <div class="main-content flex-start">
-        <p id="previous-result">Wrong!</p>
-    </div> -->
-    <div class="result-content">
-        <h1>All done!</h1>
-    </div>
-    <div class="result-content">
-        <div>
-            <p>Your final score is 22.</p>
+        </div> 
+    -->
+    <!-- ******* ASSESSMENT PAGE MODEL *******  -->
+    <!--  
+        <div class="main-content">
+            <h1>A very useful tool used during development and debugging for printing content to the debugger is:</h1>
         </div>
-    </div>
-    <div class="highscore-submission">
-        <div>
-            <p>Enter initials: </p>
+        <div class="main-content answer-choices"> 
+            <button class="answer-button">Javascript</button>
+            <button class="answer-button">terminal/bash</button>
+            <button class="answer-button">for loops</button>
+            <button class="answer-button">console.log</button>
         </div>
-        <div>
-            <input type="text">
+        <div class="main-content horizontal-row">
         </div>
-        <div>
-            <button>Submit</button>
+        <div class="main-content flex-start">
+            <p id="previous-result">Wrong!</p>
+        </div> 
+    -->
+    <!-- ******* RESULTS PAGE MODEL *******  -->
+    <!-- 
+        <div class="result-content">
+            <h1>All done!</h1>
         </div>
-    </div>
+        <div class="result-content">
+            <div>
+                <p>Your final score is 22.</p>
+            </div>
+        </div>
+        <div class="highscore-submission">
+            <div>
+                <p>Enter initials: </p>
+            </div>
+            <div>
+                <input type="text">
+            </div>
+            <div>
+                <button class="submit-button ">Submit</button>
+            </div>
+        </div> 
+    -->
+    <!-- ******* HIGHSCORES PAGE MODEL *******  -->
+    <!-- 
+        <div class="result-content">
+            <h1>High scores</h1>
+        </div>
+        <div class="high-score">
+            <div>
+                <p>1. AB - 22</p>
+            </div>
+        </div>
+        <div class="high-score">
+            <div>
+                <p>2. AB - 22</p>
+            </div>
+        </div>
+        <div class="high-score">
+            <div>
+                <p>3. AB - 22</p>
+            </div>
+        </div>
+        <div class="result-content">
+            <div>
+                <button class="submit-button ">Go back</button>
+            </div>
+            <div>
+                <button class="submit-button ">Clear high scores</button>
+            </div>
+        </div> 
+     -->
     </main>
     <script src="./assets/js/script.js"></script>
 </body>

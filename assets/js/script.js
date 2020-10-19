@@ -1,13 +1,19 @@
-const TIME_LIMIT = 30;
+const TIME_LIMIT = 35;
+const PENALTY = 10;
+
+var highscores = getHighScores();
 var  mainEl = document.querySelector('main');
+var timerEl = document.getElementById('timer');
+
 
 var answerChoicesEl;
 var startQuizButtonEl;
-var timerEl;
+var inputDivEl;
 var previousResult;
 
 var timer;
 var time = 0;
+var score;
 var quitQuiz = false;
 var problemIndex = 0;
 var problemArray = [
@@ -48,7 +54,7 @@ var problemArray = [
         ]
     },
     {
-        question: 'A very usefule tool used during development and debugging for printing content to the debugger is:',
+        question: 'A very useful tool used during development and debugging for printing content to the debugger is:',
         answerChoices: [
             {answer: 'JavaScript', correct: false}, 
             {answer: 'terminal/bash', correct: false}, 
@@ -58,19 +64,31 @@ var problemArray = [
     }
 ]
 
-//generateStartPage();
+generateStartPage();
 
+function getHighScores() {
+    return localStorage.getItem('highscores') ? JSON.parse(localStorage.getItem('highscores')) : [];
+}
+
+function initializeQuiz(){
+    time = 0;
+    score = 0;
+    problemIndex = 0;
+    previousResult = null;
+    timerEl.textContent = time;
+    clearMain();
+}
 function startQuiz(){
     startClock();
     displayAssessment(problemIndex);
 }
 
 function displayAssessment(problemIndex){    
-    if(time != 0 && !quitQuiz && problemIndex < problemArray.length){
+    if(time > 0 && problemIndex < problemArray.length){
         let problem = problemArray[problemIndex];
         generateProblemHTML(problem);
     } else{
-
+        endQuiz();
     }
 }
 
@@ -81,25 +99,25 @@ function clearMain(){
 }
 
 function endQuiz(){
-    quitQuiz = true;
-    console.log('stop button clicked');
+    console.log('ending quiz');
+    clearInterval(timer);
+    generateFeedbackPage();
+
 }
 
 function startClock(){
     time = TIME_LIMIT;
-    timer = setInterval(decrement, 1000);
+    timer = setInterval(decrement, 1000, 1);
 }
 
-function decrement(){
-    if (time !== 0){
-        time--;
+function decrement(num){
+    if (time > 0){
+        time -= num;
+        score = time;
+        timerEl.textContent = time;
     } else {
-        clearInterval(timer);
-        generateStartPage();
+        endQuiz();
     }
-
-    console.log(time);
-    timerEl.textContent = time;
 }
 
 function checkAnswer(event){
@@ -108,16 +126,40 @@ function checkAnswer(event){
         previousResult = 'Correct!';
     }else {
         previousResult = 'Wrong!'
-        time-=10
+        decrement(PENALTY);        
     }
     displayAssessment(++problemIndex);
 }
 
+function logScore(){
+    console.log('highscores', highscores, highscores.length);
+    const newScore = {
+        initials: inputDivEl.querySelector('input').value,
+        score: score 
+     };
+
+     highscores.push(newScore);
+     highscores.sort(function(a, b){return b.score - a.score});
+
+     if(highscores.length >= 4) {
+        highscores = highscores.slice(0,3);
+     }
+
+     localStorage.setItem('highscores', JSON.stringify(highscores));
+
+     generateHighscorePage();
+}
+
+function clearHighScores(){
+    localStorage.clear();
+    generateHighscorePage();
+}
+
+
 /* ********************** HTML GENERATORS ********************** */
 /* Start Page Generator */
 function generateStartPage(){
-    clearMain();
-
+    initializeQuiz();
     let headingDivEl = generateHeadingDivEl();
     let paragraphDivEl = generateParagraphDivEl();
     let startButtonDivEl = generateStartButtonDivEl();
@@ -127,7 +169,6 @@ function generateStartPage(){
     mainEl.appendChild(startButtonDivEl);
 
     startQuizButtonEl = document.getElementById('start-quiz');
-    timerEl = document.getElementById('timer');
 
     startQuizButtonEl.addEventListener('click', startQuiz);
 
@@ -207,7 +248,6 @@ function generateAnswerChoiceEl(problem){
         buttonEl.setAttribute('class', 'answer-button');
         buttonEl.setAttribute('data-answer-correct', problem.answerChoices[index].correct)
         buttonEl.textContent = (index + 1) + '. ' + problem.answerChoices[index].answer;
-        console.dir(buttonEl);
         divEl.appendChild(buttonEl);
     }
 
@@ -222,6 +262,7 @@ function generateHorizonalRowEl(){
     return horizontalDivEl;
 
 }
+
 function generatePreviousResultEl(result){
     var previousDivEl = document.createElement('div');
     var resultDivEl = document.createElement('p');
@@ -233,3 +274,175 @@ function generatePreviousResultEl(result){
     previousDivEl.appendChild(resultDivEl);
     return previousDivEl;
 }
+
+/* Feedback Generator */
+function generateFeedbackPage(){
+    var headerDivEl = generateFeedbackHeaderDivEl();
+    var paragraphDivEl = generateFeedbackParagraphDivEl();
+    var feedbackFormEl = generateFeedbackFormEl();
+
+    clearMain();
+    mainEl.appendChild(headerDivEl);
+    mainEl.appendChild(paragraphDivEl);
+    mainEl.appendChild(feedbackFormEl);
+}
+
+function generateFeedbackDivEl(){
+    var divEl = document.createElement('div');
+    divEl.setAttribute('class', 'result-content');
+    //divEl.classList.add('other-content');
+
+    return divEl;
+}
+function generateFeedbackHeaderDivEl(){
+    var divEl = generateFeedbackDivEl();
+    var headingEl = document.createElement('h1');
+
+    headingEl.textContent = 'All done!';
+    divEl.appendChild(headingEl);
+
+    return divEl;
+}
+
+function generateFeedbackParagraphDivEl(){
+    var divEl = generateFeedbackDivEl();
+    var paragraphEl = document.createElement('p');
+
+    paragraphEl.textContent = 'Your final score is: ' + score;
+    divEl.appendChild(paragraphEl);
+    
+    return divEl;
+    
+}
+
+function generateFeedbackFormDivEl(){
+    var divEl = document.createElement('div');
+    divEl.classList.add('highscore-submission');
+
+    return divEl;
+}
+
+function generateFeedbackFormParagraphDivEl(){
+    var divEl = document.createElement('div');
+    var paragraphEl = document.createElement('p');
+
+    paragraphEl.textContent = 'Enter initials: ';
+    divEl.appendChild(paragraphEl);
+
+    return divEl;
+}
+
+function generateFeedbackInputDivEl(){
+    var divEl = document.createElement('div');
+    var inputEl = document.createElement('input');
+
+    inputEl.setAttribute('type', 'text');
+    divEl.appendChild(inputEl);
+
+    return divEl;
+}
+
+function generateFeedbackButtonDivEl(){
+    var divEl = document.createElement('div');
+    var buttonEl = document.createElement('button');
+    var inputEl = inputDivEl.querySelector('input');
+    buttonEl.classList.add('submit-button');
+    buttonEl.textContent = 'Submit';
+    buttonEl.addEventListener('click', logScore);
+    divEl.appendChild(buttonEl);
+
+    return divEl;
+}
+
+function generateFeedbackFormEl(){
+    var divEl = generateFeedbackFormDivEl();
+    var paragraphDivEl = generateFeedbackFormParagraphDivEl();
+    inputDivEl = generateFeedbackInputDivEl();
+    var feedbackButtonDivEl = generateFeedbackButtonDivEl();
+
+    divEl.appendChild(paragraphDivEl);
+    divEl.appendChild(inputDivEl);
+    divEl.appendChild(feedbackButtonDivEl);
+
+    return divEl;
+}
+
+/* Highscores Generator */
+function generateHighscorePage(){
+    const updatedHighscores =  getHighScores();
+    var headingDivEl = generateHighscoreHeadingDivEl();
+    var buttonsDivEl = generateHighscoreButtonsDivEl();
+    
+    clearMain();
+    mainEl.appendChild(headingDivEl);
+    
+    for(let index = 0; index < updatedHighscores.length; index++){
+        let paragraphDivEl = generateHighscoreParagraphDivEl(index, updatedHighscores[index]);
+        mainEl.appendChild(paragraphDivEl);
+    }
+
+    mainEl.appendChild(buttonsDivEl);
+}
+
+function generateHighscoreHeadingDivEl(){
+    var divEl = document.createElement('div');
+    var headingEl = document.createElement('h1');
+
+    headingEl.textContent = 'High scores'
+    divEl.classList.add('result-content');
+    divEl.appendChild(headingEl);
+
+    return divEl;
+}
+
+function generateHighscoreParagraphDivEl(index, highscore){
+    var divEl = document.createElement('div');
+    var paragraphEl = document.createElement('p');
+
+    paragraphEl.textContent = (index + 1) + '. ' + highscore.initials + ' - ' + highscore.score;
+
+    divEl.classList.add('high-score');
+    divEl.appendChild(paragraphEl);
+
+    return divEl;
+
+}
+
+function generateHighscoreButtonsDivEl(){
+    var divEl = document.createElement('div');
+    var goBackButtonDivEl = generateHighscoreGoBackButtonDivEl();
+    var clearButtonDivEl = generateHighscoreClearButtonDivEl();
+
+    divEl.classList.add('result-content');
+    divEl.appendChild(goBackButtonDivEl);
+    divEl.appendChild(clearButtonDivEl);
+
+    return divEl;
+}
+
+function generateHighscoreGoBackButtonDivEl(){
+    var divEl = document.createElement('div');
+    var buttonEl = document.createElement('button');
+
+    buttonEl.textContent = 'Go back';
+    buttonEl.classList.add('submit-button');
+    buttonEl.addEventListener('click', generateStartPage);
+
+    divEl.appendChild(buttonEl);
+
+    return divEl;
+}
+
+function generateHighscoreClearButtonDivEl(){
+    var divEl = document.createElement('div');
+    var buttonEl = document.createElement('button');
+
+    buttonEl.textContent = 'Clear high scores';
+    buttonEl.classList.add('submit-button');
+    buttonEl.addEventListener('click', clearHighScores);
+
+    divEl.appendChild(buttonEl);
+
+    return divEl;
+}
+
